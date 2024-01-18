@@ -1,5 +1,6 @@
 Names: Logan Schwarz, Bella Boulais, Sam Bock, Rohit Bathula
 
+# Overthewire.org Bandit CTF WriteUp
 
 # PASSWORDS ARE PASSWORD TO ENTER THAT LEVEL
 ## -> made it more readable so the passwords are the passwords achieved at each level, so they match the commands used to get them 
