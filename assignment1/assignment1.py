@@ -6,7 +6,7 @@ from Crypto.Random import get_random_bytes
 # --------TASK 1-------
 def task1(key, iv):
     print("\n---------TASK 1---------\n")
-    input_file = input("Enter the name of the file to encrypt: ")
+    input_file = 'mustang.bmp'
     ecb_output_file = 'encrypted_ecb_' + input_file
     cbc_output_file = 'encrypted_cbc_' + input_file
 
