@@ -1,6 +1,8 @@
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
-
+import subprocess
+import re
+import plotly.graph_objects as go
 
 
 # --------TASK 1-------
@@ -142,6 +144,84 @@ def cbc_encrypt(plaintext, key, iv):
         prev_block = encrypted_block
 
     return ciphertext
+
+def run_openssl_speed(command):
+    result = subprocess.run(command, stdout=subprocess.PIPE, text=True, shell=True)
+    return result.stdout
+
+def parse_rsa_output(output):
+    data = []
+    lines = output.split('\n')
+    for line in lines[5:-1]:
+        words = line.split()
+        print(words)
+        data.append((int(words[1]), float(words[5]), float(words[6])))
+    return data
+
+def parse_aes_output(output):
+    data = []
+    lines = output.split('\n')
+    print(lines)
+    for line in lines[6:9]:
+        words = line.split()
+        print(words)
+        data.append((int(words[0][-3:]), float(words[2][:-1]), float(words[3][:-1]), float(words[4][:-1]), float(words[5][:-1]), float(words[6][:-1])))
+    return data
+
+def plot_rsa_graph(data):
+     # Extract data for plotting
+    key_sizes, public_throughput, private_throughput = zip(*data)
+
+    # Create a colored bar chart
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(x=key_sizes, y=public_throughput, name='Public RSA', marker_color='blue'))
+    fig.add_trace(go.Bar(x=key_sizes, y=private_throughput, name='Private RSA', marker_color='orange'))
+
+    # Update layout
+    fig.update_layout(barmode='group',
+                    title='Key Size vs Public and Private Throughput',
+                    xaxis=dict(title='Key Size'),
+                    yaxis=dict(title='Throughput'))
+
+    # Show the plot
+    fig.show()
+
+def plot_aes_graph(data):
+     # Extract data for plotting
+    block_size, k16, k64, k256, k1024, k8192 = zip(*data)
+
+    # Create a colored bar chart
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(x=block_size, y=k16, name='16 Size Block', marker_color='blue'))
+    fig.add_trace(go.Bar(x=block_size, y=k64, name='64 Size Block', marker_color='orange'))
+    fig.add_trace(go.Bar(x=block_size, y=k256, name='256 Size Block', marker_color='red'))
+    fig.add_trace(go.Bar(x=block_size, y=k1024, name='1024 Size Block', marker_color='pink'))
+    fig.add_trace(go.Bar(x=block_size, y=k8192, name='8192 Size Block', marker_color='purple'))
+
+    # Update layout
+    fig.update_layout(barmode='group',
+                    title='Key Size vs Throughput for various Block Size',
+                    xaxis=dict(title='Key Size'),
+                    yaxis=dict(title='Throughput'))
+
+    # Show the plot
+    fig.show()
+
+def task3():
+    rsa_command = 'openssl speed rsa'
+    rsa_output = run_openssl_speed(rsa_command)
+    rsa_data = parse_rsa_output(rsa_output)
+    print(rsa_data)
+    plot_rsa_graph(rsa_data)
+
+    # Plot AES graph
+    aes_command = 'openssl speed aes-128-cbc aes-192-cbc aes-256-cbc'
+    aes_output = run_openssl_speed(aes_command)
+    aes_data = parse_aes_output(aes_output)
+    print(aes_data)
+    plot_aes_graph(aes_data)
     
 
 def main():
@@ -150,7 +230,7 @@ def main():
     iv = generate_key(AES.block_size)
     task1(key, iv)
     task2(key, iv)
-
+    task3()
 
 
 if __name__ == "__main__":
