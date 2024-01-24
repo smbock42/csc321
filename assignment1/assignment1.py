@@ -1,13 +1,14 @@
 from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
 
-from helpers import pad, unpad, generate_key, ecb_encrypt, cbc_encrypt
 
 
 # --------TASK 1-------
 def task1(key, iv):
+    print("\n---------TASK 1---------\n")
     input_file = input("Enter the name of the file to encrypt: ")
     ecb_output_file = 'encrypted_ecb_' + input_file
-    cbc_output_file = 'encrytped_cbc_' + input_file
+    cbc_output_file = 'encrypted_cbc_' + input_file
 
     with open(input_file, 'rb') as file:
         bmp_header = file.read(54)
@@ -31,6 +32,7 @@ def task1(key, iv):
 
 # --------TASK 2-------
 def task2(key, iv):
+    print("\n---------TASK 2---------\n")
     user_input = "1111111admin1true1"
     encrypted_data = submit(user_input, key, iv)
     is_admin = verify(encrypted_data, key, iv)
@@ -87,14 +89,66 @@ def modify(data):
 
     return data
 
+# --------Padding-------
+def pad(block):
+    # ensure the block sizes are padded to be divisible by 128
+    pad_len = AES.block_size - len(block) % AES.block_size
+    return block + bytes([pad_len] * pad_len)
 
+
+def unpad(padded_data):
+    pad_len = padded_data[-1]
+    return padded_data[:-pad_len]
+
+# -------Generate Random Key-------
+def generate_key(size):
+    return get_random_bytes(size)
+
+# --------ECB Encryption-------
+def ecb_encrypt(plaintext, key):
+    # generate AES cipher and start of ciphertext
+    cipher = AES.new(key, AES.MODE_ECB)
+    ciphertext = b""
+
+    padded_text = pad(plaintext)
+
+    # encrypt block by block
+    for i in range(0, len(padded_text), AES.block_size):
+        block = padded_text[i:i + AES.block_size]
+        encrypted_block = cipher.encrypt(block)
+        ciphertext += encrypted_block
+
+    return ciphertext
+
+# --------CBC Encryption-------
+def cbc_encrypt(plaintext, key, iv):
+    ciphertext = b""
+    prev_block = iv
+
+    # loop through by blocksize, padding the block
+    # create new cipher based on previous block 
+    # apply and append to cyber text
+    for i in range(0, len(plaintext), AES.block_size):
+        block = plaintext[i:i + AES.block_size]
+        block  = pad(block)
+
+        cipher = AES.new(key, AES.MODE_ECB)
+
+        xor_res = bytes(x ^ y for x, y in zip(block, prev_block))
+
+        encrypted_block = cipher.encrypt(xor_res)
+
+        ciphertext += encrypted_block
+        prev_block = encrypted_block
+
+    return ciphertext
     
 
 def main():
     # generate key and iv once
     key = generate_key(AES.block_size)
     iv = generate_key(AES.block_size)
-    #task1(key, iv)
+    task1(key, iv)
     task2(key, iv)
 
 
