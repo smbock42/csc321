@@ -23,19 +23,23 @@ def chunkify(lst, n):
 def crack_password(data):
     word_chunk, user_info = data
     user, algorithm, workfactor, salt, hash_value = user_info
+    #print(user)
     for word in word_chunk:
-        hashed = bcrypt.hashpw(word.encode(), ("$" + algorithm + "$" + str(workfactor) + "$" + salt).encode())
-        hash_value = "$" + algorithm + "$" + str(workfactor) + "$" + salt + hash_value
-        if hashed.decode() == hash_value:
+        full_hash = "$" + algorithm + "$" + str(workfactor).zfill(2) + "$" + salt + hash_value
+        hashed = bcrypt.hashpw(word.encode(), full_hash.encode())
+        if hashed.decode() == full_hash:
             return word
+
 
 def crack_passwords(users):
     nltk.download('words')
-    word_list = [word.lower() for word in words.words() if len(word) >= 6 and len(word) <= 10]
+    word_list = [word for word in words.words() if len(word) >= 6 and len(word) <= 10]
     chunks = list(chunkify(word_list, len(word_list) // cpu_count()))
     pool = Pool(processes=cpu_count())
+    f = open("passwords.txt", "w")
     
     for user in users:
+        print(f"Finding {user[0]}'s password")
         start_time = time.time()
         
         for password in pool.imap_unordered(crack_password, [(chunk, user) for chunk in chunks]):
@@ -45,17 +49,21 @@ def crack_passwords(users):
                 print(f"Password: {password}")
                 print(f"Time taken: {end_time - start_time}")
                 print()
+                f.write(f"User: {user[0]} | Password: {password} | Time taken: {end_time - start_time}\n" )
                 break
     pool.terminate()
+    f.close()
 
 # def crack_passwords(users):
 #     nltk.download('words')
-#     word_list = [word.lower() for word in words.words() if len(word) >= 6 and len(word) <= 10]
+#     word_list = [word for word in words.words() if len(word) >= 6 and len(word) <= 10]
 #     for user, algorithm, workfactor, salt, hash_value in users:
+#         print(f"Finding {user}'s password")
 #         start_time = time.time()
 #         for word in word_list:
 #             hashed = bcrypt.hashpw(word.encode(), ("$" + algorithm + "$" + str(workfactor) + "$" + salt).encode())
-#             print(hashed.decode())
+
+#             hash_value = "$" + algorithm + "$" + str(workfactor).zfill(2) + "$" + salt + hash_value
 #             if hashed.decode() == hash_value:
 #                 end_time = time.time()
 #                 print(f"User: {user}")
@@ -72,4 +80,5 @@ def crack_passwords(users):
 
 if __name__ == "__main__":
     users = parse_file("shadow.txt")
+    #users= parse_file("shadow.txt")
     crack_passwords(users)
