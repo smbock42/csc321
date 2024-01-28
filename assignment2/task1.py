@@ -30,7 +30,7 @@ def find_collision(bits: int):
         hashed = hash(random_str.encode(), bits)
         attempts += 1
         if hashed in hash_values:
-            return random_str, hash_values[hashed], hashed, attempts
+            return random_str, hashed, attempts
         else:
             hash_values.add(hashed)
     
@@ -56,12 +56,11 @@ def task_1_c():
     with open("bit_collision.txt", "w") as f:
         for bits in range(8, 51, 2):
             start_time = time.time()
-            original_str, collision_str, hashed, attempts = find_collision(bits)
+            original_str, hashed, attempts = find_collision(bits)
             end_time = time.time()
             f.write(f"{bits} {end_time - start_time} {attempts}\n")
             print(f"Bits: {bits}")
             print(f'Original: {original_str}')
-            print(f'Collision: {collision_str}')
             print(f'Hash: {hashed}')
         
 
