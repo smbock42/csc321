@@ -1,19 +1,23 @@
 from Crypto.Hash import SHA256 
 import random
 import string
+import matplotlib.pyplot as plt
 
 
-def hash(data, truncate: int):
+def hash(data, truncate_bits: int):
     h = SHA256.new()
     h.update(data)
-    if truncate == 8: 
-    # truncate digest to only 8 bits
-        truncated_digest = h.digest()[:1]
-        print(truncated_digest)
-        return truncated_digest
-    else:
-        print(h.hexdigest())
-        return h.hexdigest()
+    truncate_bytes = (truncate_bits + 7) // 8  # Round up to nearest byte
+    truncated_digest = h.digest()[:truncate_bytes]
+    
+    # Further truncate to the exact number of bits
+    excess_bits = truncate_bytes * 8 - truncate_bits
+    if excess_bits > 0:
+        truncated_digest = bytearray(truncated_digest)
+        truncated_digest[-1] &= 0xFF << excess_bits  # Zero out the excess bits
+
+    print(truncated_digest)
+    return truncated_digest
     
 def generate_random_string(length):
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
@@ -50,18 +54,13 @@ def task_1_b():
 
 def task_1_c():
     # create a collision for SHA256
-    string1 = "ab"
-    string2 = "ba"
-    print(string1)
-    #hash(string1.encode(), True)
-    print(string2)
-    #hash(string2.encode(), True)
 
-    # hash(string1.encode(), True)
-    original_str, collision_str, hashed = find_collision(8)
-    print(f'Original: {original_str}')
-    print(f'Collision: {collision_str}')
-    print(f'Hash: {hashed}')
+    for bits in range(8, 17, 2):
+        # hash(string1.encode(), True)
+        original_str, collision_str, hashed = find_collision(bits)
+        print(f'Original: {original_str}')
+        print(f'Collision: {collision_str}')
+        print(f'Hash: {hashed}')
 
 
     
