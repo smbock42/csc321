@@ -63,7 +63,43 @@ def task_1_c():
             print(f'Original: {original_str}')
             print(f'Hash: {hashed}')
         
+def create_graphs():
+    # Initialize lists to store the data
+    digest_sizes = []
+    times = []
+    num_inputs = []
+
+    # Read the data from the file
+    with open("bit_collision.txt", "r") as f:
+        for line in f:
+            bits, time_taken, attempts = map(float, line.split())
+            digest_sizes.append(bits)
+            times.append(time_taken)
+            num_inputs.append(attempts)
+    
+
+    # Create the first graph (digest size vs collision time)
+    plt.figure(figsize=(10, 5))
+    plt.plot(digest_sizes, times, marker='o')
+    plt.title('Digest Size vs Collision Time')
+    plt.xlabel('Digest Size (bits)')
+    plt.ylabel('Collision Time (seconds)')
+    plt.grid(True)
+    plt.show()
+    # save the graph
+
+    # Create the second graph (digest size vs number of inputs)
+    plt.figure(figsize=(10, 5))
+    plt.plot(digest_sizes, num_inputs, marker='o')
+    plt.title('Digest Size vs Number of Inputs')
+    plt.xlabel('Digest Size (bits)')
+    plt.ylabel('Number of Inputs')
+    plt.grid(True)
+    plt.show()
+    # save the graph
+
 
 if __name__ == "__main__":
     #task_1_b()
-    task_1_c()
+    #task_1_c()
+    create_graphs() 
