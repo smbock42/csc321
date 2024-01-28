@@ -23,7 +23,7 @@ def generate_random_string(length):
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
 
 def find_collision(bits: int):
-    hash_values = {}
+    hash_values = set()
     attempts = 0
     while True:
         random_str = generate_random_string(64)
@@ -32,7 +32,7 @@ def find_collision(bits: int):
         if hashed in hash_values:
             return random_str, hash_values[hashed], hashed, attempts
         else:
-            hash_values[hashed] = random_str
+            hash_values.add(hashed)
     
 
 # give me two strings (of any length) whose Hamming distance is exacty 1 bit.
@@ -68,4 +68,3 @@ def task_1_c():
 if __name__ == "__main__":
     #task_1_b()
     task_1_c()
-
