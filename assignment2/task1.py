@@ -40,11 +40,11 @@ def find_collision(bits: int):
 def task_1_b():
     string1 = "a"
     string2 = "b"
-    for i in range(3):
+    for _ in range(3):
         print(string1)
-        hash(string1.encode(), False)
+        print(hash(string1.encode(), 256))
         print(string2)
-        hash(string2.encode(), False)
+        print(hash(string2.encode(), 256))
         string1 = chr(ord(string1) + 2)
         string2 = chr(ord(string2) + 2)
 
@@ -100,6 +100,6 @@ def create_graphs():
 
 
 if __name__ == "__main__":
-    #task_1_b()
+    task_1_b()
     #task_1_c()
-    create_graphs() 
+    #create_graphs() 
