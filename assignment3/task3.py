@@ -50,7 +50,7 @@ def main():
     k_encrypted = pow(k, public_key[1], public_key[0])
     
     #modified ciphertext
-    c_prime = (encrypted_message * k_encrypted) % public_key[0]
+    c_prime = 0
     
     print('Mallory intercepts the message and modifies it: ', c_prime)
     
