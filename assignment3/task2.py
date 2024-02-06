@@ -84,7 +84,6 @@ def main():
     malloryDecryptBob = aes_cbc_decrypt(malloryKey, bobEncrypt)  # Mallory decrypts Bob's message
     print(malloryDecryptBob)
 
-    # ...
     
     
     
